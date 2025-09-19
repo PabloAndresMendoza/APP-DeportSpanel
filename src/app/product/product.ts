@@ -16,11 +16,11 @@ import { FormsModule, NgForm } from '@angular/forms';
 export class Product implements OnInit {
   
   product = {
-    id: 0,
+    id: '',
     nombre: '',
     descripcion: '',
-    cantidad: 0,
-    precio: 0
+    cantidad: '',
+    precio: ''
   }
 
   productList: any[] = [];
@@ -37,21 +37,6 @@ export class Product implements OnInit {
     });
   }
 
-  onSubmit1() {
-    this.dataService.addProduct(this.product).subscribe({
-      next: (res) => {
-        alert('✅ Producto insertado');
-        console.log('Insertado:', res);
-
-        this.dataService.loadProducts();
-        
-        this.product = { id: 0, nombre: '', descripcion: '', cantidad: 0, precio: 0 };
-        
-      },
-      error: (err) => console.error('❌ Error al insertar', err)
-    });
-  }
-
   onSubmit(form: NgForm) {
     this.dataService.addProduct(this.product).subscribe({
       next: (res) => {
@@ -61,7 +46,7 @@ export class Product implements OnInit {
           this.productList.push(res[0]);
         }
 
-        this.product = { id: 0, nombre: '', descripcion: '', cantidad: 0, precio: 0 };
+        this.product = { id: '', nombre: '', descripcion: '', cantidad: '', precio: '' };
         form.resetForm({
           id: 0,
           nombre: '',
@@ -71,6 +56,29 @@ export class Product implements OnInit {
         });
       },
       error: (err) => console.error('❌ Error al insertar', err)
+    });
+  }
+
+  searchId: string = "";   // referencia al input
+
+  onSearch(): void {
+    console.log("🔍 Buscando con ID:", this.searchId);
+
+    if (!this.searchId) {
+      this.dataService.loadProducts();
+      return;
+    }
+
+    const id = Number(this.searchId);
+
+    this.dataService.getProductById(id).subscribe({
+      next: (res) => {
+        this.productList = Array.isArray(res) ? res : [res];
+        if (this.productList.length === 0) {
+          alert(`⚠️ No se encontró el producto con ID ${id}`);
+        }
+      },
+      error: (err) => console.error("❌ Error al buscar:", err)
     });
   }
 }

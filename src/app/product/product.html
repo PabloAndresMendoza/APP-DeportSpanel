@@ -17,10 +17,17 @@
   <h1 style="text-align: center; margin-top: 25px; margin-bottom: 20px; -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: #e50914;">Productos Deportivos</h1>
   <div class="top-bar">
     <div class="search-box">
-      <input type="text" placeholder="Buscar producto..." />
-      <button class="btn-search">🔍</button>
-    </div>
+      <!-- El name es obligatorio para ngModel -->
+      <input 
+        type="text" 
+        placeholder="Buscar producto por ID..." 
+        [(ngModel)]="searchId" 
+        name="searchId"
+        (keyup.enter)="onSearch()"
+      />
 
+      <button class="btn-search" (click)="onSearch()">🔍</button>
+    </div>
     <button class="btn-add" data-bs-toggle="modal" data-bs-target="#RegistrerModal">+ Registrar</button>
   </div>
 
@@ -37,12 +44,13 @@
         </tr>
     </thead>
     <tbody>
-<tr *ngFor="let u of productList">
-      <td>{{ u.id }}</td>
-      <td>{{ u.nombre }}</td>
-      <td>{{ u.descripcion }}</td>
-      <td>{{ u.cantidad }}</td>
-      <td>{{ u.precio }}</td>
+
+      <tr *ngFor="let p of productList">
+      <td>{{ p.id }}</td>
+      <td>{{ p.nombre }}</td>
+      <td>{{ p.descripcion }}</td>
+      <td>{{ p.cantidad }}</td>
+      <td>{{ p.precio }}</td>
           <td>
             <button class="btn-edit" data-bs-toggle="modal" data-bs-target="#EditModal">✏️</button>
           </td>
@@ -54,7 +62,7 @@
   </table>
 </div>
 
-<div style="margin-top: 24.1%;">
+<div>
   <footer class="text-center text-lg-start" style="background-color: #e50914;">
 
     <!-- Copyright -->
@@ -77,32 +85,33 @@
         <form (ngSubmit)="onSubmit(f)" #f="ngForm">
           <div class="form-group">
             <label>ID:</label>
-            <input type="text" [(ngModel)]="product.id" name="id" required class="form-control"/>
+            <input type="text" [(ngModel)]="product.id" name="id" required class="form-control" placeholder="Código del producto"/>
           </div>
           <div class="form-group">
             <label>Nombre:</label>
-            <input type="text" [(ngModel)]="product.nombre" name="nombre" required class="form-control"/>
+            <input type="text" [(ngModel)]="product.nombre" name="nombre" required class="form-control" placeholder="Nombre del producto"/>
           </div>
 
           <div class="form-group">
             <label>Descripción:</label>
-            <input type="text" [(ngModel)]="product.descripcion" name="descripcion" required class="form-control"/>
+            <input type="text" [(ngModel)]="product.descripcion" name="descripcion" required class="form-control" placeholder="Descripción del producto"/>
           </div>          
 
           <div class="form-group">
             <label>Cantidad:</label>
-            <input type="number" [(ngModel)]="product.cantidad" name="cantidad" required class="form-control"/>
+            <input type="number" [(ngModel)]="product.cantidad" name="cantidad" required class="form-control" placeholder="Cantidad del producto"/>
           </div>   
 
           <div class="form-group">
             <label>Precio:</label>
-            <input type="number" [(ngModel)]="product.precio" name="precio" required class="form-control"/>
+            <input type="number" [(ngModel)]="product.precio" name="precio" required class="form-control" placeholder="Precio del producto"/>
           </div>
 
           <button type="submit" class="btn-guardar">Guardar</button>
           <button type="button" class="btn-cerrar" data-bs-dismiss="modal">Cerrar</button>
         </form>
       </div>
+      
     </div>
   </div>
 </div>

@@ -9,6 +9,8 @@ export class DataService {
    private products$ = new BehaviorSubject<any[]>([]);
 
   private apiUrl = 'https://dmrrbmzxvrwlbxrfjbdf.supabase.co/rest/v1/product?select=*';
+  private apiUrlInsert = 'https://dmrrbmzxvrwlbxrfjbdf.supabase.co/rest/v1/product';
+  private apiUrlId = 'https://dmrrbmzxvrwlbxrfjbdf.supabase.co/rest/v1/product?select=id'
   private headers = new HttpHeaders({
     'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtcnJibXp4dnJ3bGJ4cmZqYmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTk5MTIsImV4cCI6MjA3MzczNTkxMn0.4U6d84UBkGVn0yeUODayBBUP6PTcl7uwx4IY1Lguc2k',
     'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtcnJibXp4dnJ3bGJ4cmZqYmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTk5MTIsImV4cCI6MjA3MzczNTkxMn0.4U6d84UBkGVn0yeUODayBBUP6PTcl7uwx4IY1Lguc2k'
@@ -30,11 +32,26 @@ export class DataService {
     return this.products$.asObservable();
   }
 
-addProduct(product: any): Observable<any[]> {
-  return this.http.post<any[]>(
-    this.apiUrl,
-    product,
-    { headers: this.headers.set('Prefer', 'return=representation') }
-  );
-}
+  addProduct(product: any): Observable<any[]> {
+    return this.http.post<any[]>(
+      this.apiUrlInsert,
+      product,
+      { headers: this.headers.set('Prefer', 'return=representation') }
+    );
+  }
+
+  getProductById(id: number): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.apiUrlId}?id=eq.${id}`,
+      { headers: this.headers }
+    );
+  }
+
+    loadProductsId(): void {
+    this.http.get<any[]>(this.apiUrlId, { headers: this.headers })
+      .subscribe({
+        next: (data) => this.products$.next(data),
+        error: (err) => console.error('Error al cargar productos:', err)
+      });
+  }
 }
