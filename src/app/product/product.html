@@ -74,32 +74,34 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form (ngSubmit)="onSubmit(f)" #f="ngForm">
           <div class="form-group">
-            <label for="InputCodigo">Código</label>
-            <input type="number" class="form-control" id="codigoProduct" aria-describedby="codigoHelp" placeholder="Código del producto">
+            <label>ID:</label>
+            <input type="text" [(ngModel)]="product.id" name="id" required class="form-control"/>
           </div>
           <div class="form-group">
-            <label for="InputNombre">Nombre</label>
-            <input type="text" class="form-control" id="" aria-describedby="nombreHelp" placeholder="Nombre del producto">
+            <label>Nombre:</label>
+            <input type="text" [(ngModel)]="product.nombre" name="nombre" required class="form-control"/>
           </div>
+
           <div class="form-group">
-            <label for="InputDescripcion">Descripción</label>
-            <input type="text" class="form-control" id="" aria-describedby="descripcionHelp" placeholder="Descripción del producto">
-          </div>
+            <label>Descripción:</label>
+            <input type="text" [(ngModel)]="product.descripcion" name="descripcion" required class="form-control"/>
+          </div>          
+
           <div class="form-group">
-            <label for="InputCantidad">Cantidad</label>
-            <input type="number" class="form-control" id="cantidadProduct" aria-describedby="codigoHelp" placeholder="Cantidad del producto">
-          </div>
+            <label>Cantidad:</label>
+            <input type="number" [(ngModel)]="product.cantidad" name="cantidad" required class="form-control"/>
+          </div>   
+
           <div class="form-group">
-            <label for="InputPrecio">Precio</label>
-            <input type="number" class="form-control" id="precioProduct" aria-describedby="codigoHelp" placeholder="Precio del producto">
+            <label>Precio:</label>
+            <input type="number" [(ngModel)]="product.precio" name="precio" required class="form-control"/>
           </div>
+
+          <button type="submit" class="btn-guardar">Guardar</button>
+          <button type="button" class="btn-cerrar" data-bs-dismiss="modal">Cerrar</button>
         </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn-cerrar" data-bs-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn-guardar">Guardar</button>
       </div>
     </div>
   </div>

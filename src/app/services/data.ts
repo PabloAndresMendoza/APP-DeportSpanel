@@ -29,4 +29,12 @@ export class DataService {
   getProducts(): Observable<any[]> {
     return this.products$.asObservable();
   }
+
+addProduct(product: any): Observable<any[]> {
+  return this.http.post<any[]>(
+    this.apiUrl,
+    product,
+    { headers: this.headers.set('Prefer', 'return=representation') }
+  );
+}
 }
