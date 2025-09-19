@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { DataTablesModule } from 'angular-datatables';
 import { Settings } from 'http2';
 import { Subject } from 'rxjs';
+import { DataService } from '../services/data';
 
 @Component({
   selector: 'app-product',
@@ -11,30 +12,18 @@ import { Subject } from 'rxjs';
   templateUrl: './product.html',
   styleUrl: './product.css'
 })
-export class Product implements OnInit, OnDestroy {
+export class Product implements OnInit {
+  productList: any[] = [];
 
-  dtOptions: any = {};
-  dtTrigger: Subject<any> = new Subject<any>();
-
-  products = [
-    { id: 1, nombre: 'Pantaloneta', descripcion: 'Pantaloneta para nadar', cantidad: 1, precio: 12000 },
-    { id: 2, nombre: 'Camiseta', descripcion: 'Camiseta para nadar', cantidad: 3, precio: 52000 },
-    { id: 3, nombre: 'Medias', descripcion: 'Medias para nadar', cantidad: 6, precio: 10000 },
-  ];
+  constructor(private productService: DataService) {}
 
   ngOnInit(): void {
-    this.dtOptions = {
-      pagingType: 'full_numbers',
-      pageLength: 5,
-      language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' }
-    };
+    // Siempre cargamos los productos al iniciar el componente
+    this.productService.loadProducts();
 
-    // Si tus datos vinieran de una API, aquí harías la petición
-    // y al final llamarías a this.dtTrigger.next();
-    this.dtTrigger.next(null);
-  }
-
-  ngOnDestroy(): void {
-    this.dtTrigger.unsubscribe();
+    // Nos suscribimos al observable para actualizar la lista cuando lleguen los datos
+    this.productService.getProducts().subscribe(data => {
+      this.productList = data;
+    });
   }
 }

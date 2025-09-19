@@ -1,0 +1,11 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "nombre": "holaaa",
+      "descripcion": "holaaa",
+      "cantidad": 1,
+      "precio": "999.99"
+    }
+  ]
+}

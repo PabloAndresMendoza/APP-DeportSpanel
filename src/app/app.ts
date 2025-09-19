@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
+import { DataService } from './services/data';
 
 
 @Component({
@@ -10,6 +11,11 @@ import { Router } from '@angular/router';
   template: `<router-outlet></router-outlet>`,
   styleUrl: './app.css'
 })
-export class App {
-  protected title = 'DeportSpanel';
+export class App implements OnInit {
+
+  constructor(private productService: DataService) {}
+
+  ngOnInit(): void {
+    this.productService.loadProducts();
+  }
 }
