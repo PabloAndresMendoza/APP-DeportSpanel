@@ -1,19 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { DataTablesModule } from 'angular-datatables';
 import { Subject } from 'rxjs';
 
 interface Product {
   id: number;
+  usuario: string;
   nombre: string;
-  precio: number;
-  stock: number;
+  email: string;
+  ntelefonico: number;
 }
 
 @Component({
   selector: 'app-user',
-  imports: [CommonModule, DataTablesModule,RouterModule],
+  imports: [CommonModule,RouterModule],
   templateUrl: './user.html',
   styleUrl: './user.css'
 })
@@ -33,14 +33,14 @@ export class User implements OnInit {
   ngOnInit(): void {
     // Datos quemados de prueba
     this.products = [
-      { id: 1, nombre: 'Laptop', precio: 2500, stock: 8 },
-      { id: 2, nombre: 'Mouse', precio: 30, stock: 50 },
-      { id: 3, nombre: 'Teclado', precio: 70, stock: 25 },
-      { id: 4, nombre: 'Monitor', precio: 500, stock: 15 },
-      { id: 5, nombre: 'Impresora', precio: 200, stock: 10 },
-      { id: 6, nombre: 'Tablet', precio: 300, stock: 12 },
-      { id: 7, nombre: 'Celular', precio: 900, stock: 30 },
-      { id: 8, nombre: 'Disco SSD', precio: 120, stock: 40 }
+      { id: 1, usuario: 'pablo1', nombre: 'Pablo', email: 'h@gmail.com', ntelefonico: 3},
+      { id: 2, usuario: 'pablo1', nombre: 'Anderson', email: 'h@gmail.com', ntelefonico: 3},
+      { id: 3, usuario: 'pablo1', nombre: 'Andres', email: 'h@gmail.com', ntelefonico: 3 },
+      { id: 4, usuario: 'pablo1', nombre: 'Daniel', email: 'h@gmail.com', ntelefonico: 3},
+      { id: 5, usuario: 'pablo1', nombre: 'Jose', email: 'h@gmail.com', ntelefonico: 3 },
+      { id: 6, usuario: 'pablo1', nombre: 'Maria', email: 'h@gmail.com', ntelefonico: 3 },
+      { id: 7, usuario: 'pablo1', nombre: 'Cecilia', email: 'h@gmail.com', ntelefonico: 3 },
+      { id: 8, usuario: 'pablo1', nombre: 'Oscar', email: 'h@gmail.com', ntelefonico: 3 }
     ];
     this.updatePagination();
   }

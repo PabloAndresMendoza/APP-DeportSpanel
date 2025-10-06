@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { DataTablesModule } from 'angular-datatables';
 import { Settings } from 'http2';
 import { Subject } from 'rxjs';
 import { DataService } from '../services/data';
 import { FormsModule, NgForm } from '@angular/forms';
+import { ProductsInterface } from '../interface/product.interface';
 
 @Component({
   selector: 'app-product',
-  imports: [CommonModule, DataTablesModule,RouterModule, FormsModule],
+  imports: [CommonModule,RouterModule, FormsModule],
   templateUrl: './product.html',
   styleUrl: './product.css'
 })
@@ -23,7 +23,9 @@ export class Product implements OnInit {
     precio: ''
   }
 
-  productList: any[] = [];
+  productList: ProductsInterface[] = [];
+    selectedProduct: any = null;
+private modal: any;
 
   constructor(private dataService: DataService) {}
 
@@ -59,26 +61,90 @@ export class Product implements OnInit {
     });
   }
 
-  searchId: string = "";   // referencia al input
+  deleteProduct(id: number) {
+    if (confirm(`¿Seguro que deseas eliminar el producto con ID ${id}?`)) {
+      this.dataService.deleteProduct(id).subscribe({
+        next: () => {
+          console.log(`✅ Producto ${id} eliminado`);
+          alert('Producto eliminado');
 
-  onSearch(): void {
-    console.log("🔍 Buscando con ID:", this.searchId);
+          this.productList = this.productList.filter(p => p.id !== id);
 
-    if (!this.searchId) {
+        },
+        error: (err) => {
+          console.error('Error al eliminar:', err);
+        }
+      });
+    }
+  }
+
+  id: number | null = null;
+
+  searchProduct(form: NgForm) {
+    const raw = (form.value.id ?? '').toString().trim();
+    if (!raw) {
       this.dataService.loadProducts();
       return;
     }
 
-    const id = Number(this.searchId);
+    const id = Number(raw);
+    if (Number.isNaN(id)) {
+      alert('Ingrese un ID numérico válido');
+      return;
+    }
 
     this.dataService.getProductById(id).subscribe({
-      next: (res) => {
-        this.productList = Array.isArray(res) ? res : [res];
+      next: (res: any[]) => {
+        this.productList = Array.isArray(res) ? res : (res ? [res] : []);
         if (this.productList.length === 0) {
-          alert(`⚠️ No se encontró el producto con ID ${id}`);
+          alert(`No se encontró producto con ID ${id}`);
         }
       },
-      error: (err) => console.error("❌ Error al buscar:", err)
+      error: (err) => console.error('Error buscando por ID:', err)
     });
   }
+
+openModal(id: number) {
+  console.log('🟡 Abriendo modal para ID:', id);
+
+  this.dataService.getProductById(id).subscribe({
+    next: (res) => {
+      if (res && res.length > 0) {
+        this.selectedProduct = res[0];
+        console.log('🟢 Datos del producto:', this.selectedProduct);
+
+        // Esperar a que Angular actualice la vista
+        setTimeout(() => {
+          const modalEl = document.getElementById('productModal');
+          if (modalEl) {
+            this.modal = new (window as any).bootstrap.Modal(modalEl);
+            this.modal.show();
+          } else {
+            console.error('❌ No se encontró el elemento del modal');
+          }
+        }, 100);
+      } else {
+        alert('No se encontró el producto con ese ID.');
+      }
+    },
+    error: (err) => {
+      console.error('Error al obtener producto:', err);
+    },
+  });
+}
+
+  updateSelectedProduct() {
+    if (!this.selectedProduct) return;
+
+    this.dataService.updateProduct(this.selectedProduct.id, this.selectedProduct).subscribe({
+      next: () => {
+        alert('✅ Producto actualizado');
+        this.modal.hide();       // cerrar modal
+      //  this.dataService.loadProducts();     // refrescar tabla
+      },
+      error: (err) => console.error('❌ Error al actualizar producto', err)
+    });
+  }
+
+  
 }

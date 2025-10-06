@@ -5,7 +5,7 @@
       Panel
     </a>   
     <a routerLink="/user" routerLinkActive="active">
-      Usarios
+      Usuarios
     </a>
     <a routerLink="/home" routerLinkActive="active">
       Cerrar Sesión
@@ -13,20 +13,14 @@
   </nav>
 </header>
 
-<div class="container">
+<div class="container" style="min-height: 84vh; ">
   <h1 style="text-align: center; margin-top: 25px; margin-bottom: 20px; -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: #e50914;">Productos Deportivos</h1>
   <div class="top-bar">
     <div class="search-box">
-      <!-- El name es obligatorio para ngModel -->
-      <input 
-        type="text" 
-        placeholder="Buscar producto por ID..." 
-        [(ngModel)]="searchId" 
-        name="searchId"
-        (keyup.enter)="onSearch()"
-      />
-
-      <button class="btn-search" (click)="onSearch()">🔍</button>
+      <form (ngSubmit)="searchProduct(f)" #f="ngForm">
+        <input type="number" [(ngModel)]="id" name="id" [ngModelOptions]="{ updateOn: 'submit' }" />
+        <button type="submit" class="btn-add">🔍 Buscar</button>
+      </form>
     </div>
     <button class="btn-add" data-bs-toggle="modal" data-bs-target="#RegistrerModal">+ Registrar</button>
   </div>
@@ -52,10 +46,10 @@
       <td>{{ p.cantidad }}</td>
       <td>{{ p.precio }}</td>
           <td>
-            <button class="btn-edit" data-bs-toggle="modal" data-bs-target="#EditModal">✏️</button>
+            <button class="btn-edit" (click)="openModal(p.id)">✏️</button>
           </td>
           <td>
-            <button class="btn-delete">🗑️</button>
+            <button class="btn-edit" (click)="deleteProduct(p.id)" >🗑️</button>
           </td>
     </tr>
     </tbody>
@@ -63,7 +57,7 @@
 </div>
 
 <div>
-  <footer class="text-center text-lg-start" style="background-color: #e50914;">
+  <footer class="text-center text-lg-start" style="background-color: #e50914; margin-top: auto;">
 
     <!-- Copyright -->
     <div class="text-center text-white p-3">
@@ -116,40 +110,34 @@
   </div>
 </div>
 
-<div class="modal fade" id="EditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="productModal" tabindex="-1">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content" *ngIf="selectedProduct">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Edita El Producto</h1>
+        <h5 class="modal-title" >Editar producto</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form (ngSubmit)="updateSelectedProduct()" #f="ngForm">
           <div class="form-group">
-            <label for="InputCodigo">Código</label>
-            <input type="number" class="form-control" id="codigoProduct" aria-describedby="codigoHelp" placeholder="Código del producto">
+            <label>Nombre:</label>
+            <input type="text" [(ngModel)]="selectedProduct.nombre" name="nombre" class="form-control" required />
           </div>
           <div class="form-group">
-            <label for="InputNombre">Nombre</label>
-            <input type="text" class="form-control" id="" aria-describedby="nombreHelp" placeholder="Nombre del producto">
-          </div>
+            <label>Descripción:</label>
+            <input type="text" [(ngModel)]="selectedProduct.descripcion" name="descripcion" class="form-control" required />
+          </div>       
           <div class="form-group">
-            <label for="InputDescripcion">Descripción</label>
-            <input type="text" class="form-control" id="" aria-describedby="descripcionHelp" placeholder="Descripción del producto">
-          </div>
+            <label>Cantidad:</label>
+            <input type="number" [(ngModel)]="selectedProduct.cantidad" name="cantidad" class="form-control" required />
+          </div>          
           <div class="form-group">
-            <label for="InputCantidad">Cantidad</label>
-            <input type="number" class="form-control" id="cantidadProduct" aria-describedby="codigoHelp" placeholder="Cantidad del producto">
+            <label>Precio:</label>
+            <input type="number" [(ngModel)]="selectedProduct.precio" name="precio" class="form-control" required />
           </div>
-          <div class="form-group">
-            <label for="InputPrecio">Precio</label>
-            <input type="number" class="form-control" id="precioProduct" aria-describedby="codigoHelp" placeholder="Precio del producto">
-          </div>
+          <button type="submit" class="btn-guardar">Guardar Cambios</button>
+          <button type="button" class="btn-cerrar"data-bs-dismiss="modal">Cancelar</button>
         </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn-cerrar" data-bs-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn-guardar">Guardar</button>
       </div>
     </div>
   </div>
