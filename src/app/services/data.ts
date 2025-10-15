@@ -6,14 +6,13 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class DataService {
-   private products$ = new BehaviorSubject<any[]>([]);
+  private products$ = new BehaviorSubject<any[]>([]);
 
   private apiUrl = 'https://dmrrbmzxvrwlbxrfjbdf.supabase.co/rest/v1/product?select=*&order=id.asc';
   private apiUrlInsert = 'https://dmrrbmzxvrwlbxrfjbdf.supabase.co/rest/v1/product';
   private apiUrlId = 'https://dmrrbmzxvrwlbxrfjbdf.supabase.co/rest/v1/product?select=id'
   private apiUrlDeleted = 'https://dmrrbmzxvrwlbxrfjbdf.supabase.co/rest/v1/product';
   private apiBase = 'https://dmrrbmzxvrwlbxrfjbdf.supabase.co/rest/v1/product';
-
 
   private headers = new HttpHeaders({
     'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtcnJibXp4dnJ3bGJ4cmZqYmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTk5MTIsImV4cCI6MjA3MzczNTkxMn0.4U6d84UBkGVn0yeUODayBBUP6PTcl7uwx4IY1Lguc2k',
@@ -22,7 +21,6 @@ export class DataService {
 
   constructor(private http: HttpClient) {}
 
-/** Trae los productos desde la API y actualiza el BehaviorSubject */
   loadProducts(): void {
     this.http.get<any[]>(this.apiUrl, { headers: this.headers })
       .subscribe({
@@ -31,7 +29,6 @@ export class DataService {
       });
   }
 
-  /** Devuelve el observable para suscribirse */
   getProducts(): Observable<any[]> {
     return this.products$.asObservable();
   }
@@ -57,7 +54,7 @@ export class DataService {
     return this.http.get<any[]>(this.apiBase, { headers: this.headers, params });
   }
 
-    updateProduct(id: number, product: any): Observable<any> {
+  updateProduct(id: number, product: any): Observable<any> {
     return this.http.patch<any>(
       `${this.apiUrlDeleted}?id=eq.${id}`,
       product,

@@ -5,3 +5,11 @@ export interface ProductsInterface{
     cantidad: number,
     precio: number
 }
+
+export interface ProductsInterfaceAPI{
+    idProductos: number,
+    nombreProductos: string,
+    descripcionProductos: string,
+    cantidadProductos: string,
+    fechaProductos: string
+}

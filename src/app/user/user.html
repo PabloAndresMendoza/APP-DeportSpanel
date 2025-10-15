@@ -13,57 +13,128 @@
   </nav>
 </header>
 
-<div class="container">
-  <h1 style="text-align: center; margin-top: 15px; margin-bottom: 20px; -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: #e50914;">Usuarios</h1>
+<div class="container" style="min-height: 84vh;">
+  <h1 style="text-align: center; margin-top: 25px;">Gestión de Productos</h1>
 
-<table class="table table-striped table-bordered">
-    <thead class="table-dark">
+  <div class="top-bar">
+    <div class="search-box">
+      <input type="number" [(ngModel)]="idBusqueda" placeholder="Buscar por ID" />
+      <button class="btn-add" (click)="buscarPorId()">🔍 Buscar</button>
+      <button class="btn-add" (click)="mostrarTodos()">Mostrar todos</button>
+      <button class="btn-add" data-bs-toggle="modal" data-bs-target="#RegistrerModal">+ Registrar</button>
+    </div>
+  </div>
+
+  <table class="table table-striped">
+    <thead>
       <tr>
-        <th (click)="sort('id')">ID</th>
-        <th (click)="sort('usuario')">Usuario</th>
-        <th (click)="sort('nombre')">Nombre</th>
-        <th (click)="sort('email')">Email</th>
-        <th (click)="sort('ntelefonico')">Número Telefonico</th>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Cantidad</th>
+        <th>Fecha</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let p of paginatedProducts">
-        <td>{{ p.id }}</td>
-        <td>{{ p.usuario }}</td>
-        <td>{{ p.nombre }}</td>
-        <td>{{ p.email | currency }}</td>
-        <td>{{ p.ntelefonico }}</td>
+      <tr *ngFor="let p of productos">
+        <td>{{ p.idProductos }}</td>
+        <td>{{ p.nombreProductos }}</td>
+        <td>{{ p.descripcionProductos }}</td>
+        <td>{{ p.cantidadProductos }}</td>
+        <td>{{ p.fechaProductos }}</td>
+        <td>
+          <button class="btn btn-warning btn-sm me-1" (click)="openModal(p.idProductos)">✏️ Editar</button>
+          <button class="btn btn-danger" (click)="eliminarProducto(p.idProductos)">Eliminar</button>
+        </td>
       </tr>
     </tbody>
   </table>
-
-  <!-- Paginación -->
-  <nav>
-    <ul class="pagination">
-      <li class="page-item" [class.disabled]="page === 1">
-        <a class="page-link" (click)="changePage(page - 1)">Anterior</a>
-      </li>
-
-      <li 
-        class="page-item" 
-        *ngFor="let p of totalPagesArray" 
-        [class.active]="p === page">
-        <a class="page-link" (click)="changePage(p)">{{ p }}</a>
-      </li>
-
-      <li class="page-item" [class.disabled]="page === totalPages">
-        <a class="page-link" (click)="changePage(page + 1)">Siguiente</a>
-      </li>
-    </ul>
-  </nav>
 </div>
 
-<div style="margin-top: 19%;">
-  <footer class="text-center text-lg-start" style="background-color: #e50914;">
+<div class="modal fade" id="RegistrerModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Registra El Producto</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="onSubmit(f)" #f="ngForm">
+          <div class="form-group">
+            <label>ID:</label>
+            <input type="text" [(ngModel)]="products.idProductos" name="idProductos" required class="form-control" placeholder="Código del producto"/>
+          </div>
+          <div class="form-group">
+            <label>Nombre:</label>
+            <input type="text" [(ngModel)]="products.nombreProductos" name="nombreProductos" required class="form-control" placeholder="Nombre del producto"/>
+          </div>
 
+          <div class="form-group">
+            <label>Descripción:</label>
+            <input type="text" [(ngModel)]="products.descripcionProductos" name="descripcionProductos" required class="form-control" placeholder="Descripción del producto"/>
+          </div>          
+
+          <div class="form-group">
+            <label>Cantidad:</label>
+            <input type="number" [(ngModel)]="products.cantidadProductos" name="cantidadProductos" required class="form-control" placeholder="Cantidad del producto"/>
+          </div>   
+
+          <div class="form-group">
+            <label>Precio:</label>
+            <input type="text" [(ngModel)]="products.fechaProductos" name="fechaProductos" required class="form-control" placeholder="Precio del producto"/>
+          </div>
+
+          <button type="submit" class="btn-guardar">Guardar</button>
+          <button type="button" class="btn-cerrar" data-bs-dismiss="modal">Cerrar</button>
+        </form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- ✏️ Modal de edición -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title" id="productModalLabel">Editar Producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form *ngIf="selectedProduct">
+          <div class="mb-3">
+            <label>Nombre</label>
+            <input type="text" [(ngModel)]="selectedProduct.nombreProductos" name="nombreProductos" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label>Descripción</label>
+            <input type="text" [(ngModel)]="selectedProduct.descripcionProductos" name="descripcionProductos" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label>Cantidad</label>
+            <input type="number" [(ngModel)]="selectedProduct.cantidadProductos" name="cantidadProductos" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label>Fecha</label>
+            <input type="date" [(ngModel)]="selectedProduct.fechaProductos" name="fechaProductos" class="form-control">
+          </div>
+          <button type="button" class="btn btn-success w-100" (click)="updateSelectedProduct()">Guardar Cambios</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <footer class="text-center text-lg-start" style="background-color: #e50914; margin-top: auto;">
+
+    <!-- Copyright -->
     <div class="text-center text-white p-3">
       © 2025 Ingeniería WEB II:
       <a class="text-white" href="#">Pablo Andres Mendoza Barreto</a>
     </div>
   </footer>
+  
 </div>

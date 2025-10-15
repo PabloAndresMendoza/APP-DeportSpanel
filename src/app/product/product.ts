@@ -24,16 +24,15 @@ export class Product implements OnInit {
   }
 
   productList: ProductsInterface[] = [];
-    selectedProduct: any = null;
-private modal: any;
+  selectedProduct: any = null;
+  private modal: any;
+  id: number | null = null;
 
   constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
-    // Siempre cargamos los productos al iniciar el componente
     this.dataService.loadProducts();
 
-    // Nos suscribimos al observable para actualizar la lista cuando lleguen los datos
     this.dataService.getProducts().subscribe(data => {
       this.productList = data;
     });
@@ -78,8 +77,6 @@ private modal: any;
     }
   }
 
-  id: number | null = null;
-
   searchProduct(form: NgForm) {
     const raw = (form.value.id ?? '').toString().trim();
     if (!raw) {
@@ -104,34 +101,33 @@ private modal: any;
     });
   }
 
-openModal(id: number) {
-  console.log('🟡 Abriendo modal para ID:', id);
+  openModal(id: number) {
+    console.log('Abriendo modal para ID:', id);
 
-  this.dataService.getProductById(id).subscribe({
-    next: (res) => {
-      if (res && res.length > 0) {
-        this.selectedProduct = res[0];
-        console.log('🟢 Datos del producto:', this.selectedProduct);
+    this.dataService.getProductById(id).subscribe({
+      next: (res) => {
+        if (res && res.length > 0) {
+          this.selectedProduct = res[0];
+          console.log('Datos del producto:', this.selectedProduct);
 
-        // Esperar a que Angular actualice la vista
-        setTimeout(() => {
-          const modalEl = document.getElementById('productModal');
-          if (modalEl) {
-            this.modal = new (window as any).bootstrap.Modal(modalEl);
-            this.modal.show();
-          } else {
-            console.error('❌ No se encontró el elemento del modal');
-          }
-        }, 100);
-      } else {
-        alert('No se encontró el producto con ese ID.');
-      }
-    },
-    error: (err) => {
-      console.error('Error al obtener producto:', err);
-    },
-  });
-}
+          setTimeout(() => {
+            const modalEl = document.getElementById('productModal');
+            if (modalEl) {
+              this.modal = new (window as any).bootstrap.Modal(modalEl);
+              this.modal.show();
+            } else {
+              console.error('❌ No se encontró el elemento del modal');
+            }
+          }, 100);
+        } else {
+          alert('No se encontró el producto con ese ID.');
+        }
+      },
+      error: (err) => {
+        console.error('Error al obtener producto:', err);
+      },
+    });
+  }
 
   updateSelectedProduct() {
     if (!this.selectedProduct) return;
@@ -144,7 +140,5 @@ openModal(id: number) {
       },
       error: (err) => console.error('❌ Error al actualizar producto', err)
     });
-  }
-
-  
+  }  
 }

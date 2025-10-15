@@ -1,88 +1,130 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { Subject } from 'rxjs';
-
-interface Product {
-  id: number;
-  usuario: string;
-  nombre: string;
-  email: string;
-  ntelefonico: number;
-}
+import { ProductsInterface, ProductsInterfaceAPI } from '../interface/product.interface';
+import { DataApiService } from '../services/data-api';
 
 @Component({
   selector: 'app-user',
-  imports: [CommonModule,RouterModule],
+  imports: [CommonModule,RouterModule, FormsModule],
   templateUrl: './user.html',
   styleUrl: './user.css'
 })
 export class User implements OnInit {
-  products: Product[] = [];
-  paginatedProducts: Product[] = [];
-  
-  // Paginación
-  page: number = 1;
-  pageSize: number = 5;
-  totalPages: number = 0;
 
-  // Ordenamiento
-  sortColumn: keyof Product = 'id';
-  sortDirection: 'asc' | 'desc' = 'asc';
+  products = {
+    idProductos: '',
+    nombreProductos: '',
+    descripcionProductos: '',
+    cantidadProductos: '',
+    fechaProductos: ''
+  }
+
+  productos: ProductsInterfaceAPI[] = [];
+  idBusqueda: number | null = null;
+  selectedProduct: any = null;
+  private modal: any;
+
+  constructor(private dataService: DataApiService) {}
 
   ngOnInit(): void {
-    // Datos quemados de prueba
-    this.products = [
-      { id: 1, usuario: 'pablo1', nombre: 'Pablo', email: 'h@gmail.com', ntelefonico: 3},
-      { id: 2, usuario: 'pablo1', nombre: 'Anderson', email: 'h@gmail.com', ntelefonico: 3},
-      { id: 3, usuario: 'pablo1', nombre: 'Andres', email: 'h@gmail.com', ntelefonico: 3 },
-      { id: 4, usuario: 'pablo1', nombre: 'Daniel', email: 'h@gmail.com', ntelefonico: 3},
-      { id: 5, usuario: 'pablo1', nombre: 'Jose', email: 'h@gmail.com', ntelefonico: 3 },
-      { id: 6, usuario: 'pablo1', nombre: 'Maria', email: 'h@gmail.com', ntelefonico: 3 },
-      { id: 7, usuario: 'pablo1', nombre: 'Cecilia', email: 'h@gmail.com', ntelefonico: 3 },
-      { id: 8, usuario: 'pablo1', nombre: 'Oscar', email: 'h@gmail.com', ntelefonico: 3 }
-    ];
-    this.updatePagination();
+    this.mostrarTodos();
   }
 
-  // Cambiar de página
-  changePage(p: number) {
-    if (p >= 1 && p <= this.totalPages) {
-      this.page = p;
-      this.updatePagination();
+  // 🔹 Cargar todos
+  mostrarTodos(): void {
+    this.dataService.loadProducts();
+    this.dataService.getProducts().subscribe({
+      next: (data) => (this.productos = data),
+      error: (err) => console.error('Error mostrando todos:', err)
+    });
+  }
+
+  // 🔹 Buscar por ID
+  buscarPorId(): void {
+    if (!this.idBusqueda || isNaN(this.idBusqueda)) {
+      alert('Ingrese un ID válido');
+      return;
     }
+
+    this.dataService.getProductById(this.idBusqueda).subscribe({
+      next: (res) => {
+        console.log('Respuesta API:', res);
+
+        if (res && res.idProductos) {
+          this.productos = [res];
+        } else {
+          alert(`No se encontró producto con ID ${this.idBusqueda}`);
+        }
+      },
+      error: (err) => {
+        console.error('❌ Error buscando producto:', err);
+        alert('Error al buscar el producto.');
+      }
+    });
   }
 
-  // Actualizar datos paginados
-  updatePagination() {
-    this.totalPages = Math.ceil(this.products.length / this.pageSize);
-    const start = (this.page - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    this.paginatedProducts = [...this.products]
-      .sort((a, b) => this.compare(a, b))
-      .slice(start, end);
+  // 🔹 Eliminar producto
+  eliminarProducto(idProductos: number): void {
+    if (!confirm(`¿Seguro que deseas eliminar el producto con ID ${idProductos}?`)) return;
+
+    this.dataService.deleteProduct(idProductos).subscribe({
+      next: () => {
+        alert(`✅ Producto con ID ${idProductos} eliminado correctamente.`);
+        this.mostrarTodos();
+      },
+      error: (err) => {
+        console.error('❌ Error al eliminar:', err);
+        alert('Error al eliminar el producto.');
+      }
+    });
   }
 
-  // Ordenar
-  sort(column: keyof Product) {
-    if (this.sortColumn === column) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-      this.sortColumn = column;
-      this.sortDirection = 'asc';
-    }
-    this.updatePagination();
+   onSubmit(form: NgForm) {
+    this.dataService.addProduct(this.products).subscribe({
+      next: (res) => {
+        alert('✅ Producto insertado correctamente');
+        this.dataService.loadProducts();
+        form.resetForm();
+      },
+      error: (err) => console.error('❌ Error al insertar producto:', err)
+    });
   }
 
-  compare(a: Product, b: Product): number {
-    const valueA = a[this.sortColumn];
-    const valueB = b[this.sortColumn];
-    if (valueA < valueB) return this.sortDirection === 'asc' ? -1 : 1;
-    if (valueA > valueB) return this.sortDirection === 'asc' ? 1 : -1;
-    return 0;
+    // 🔹 Abrir modal para editar
+  openModal(idProductos: number) {
+    this.dataService.getProductById(idProductos).subscribe({
+      next: (res) => {
+        if (res && res.length > 0) {
+          this.selectedProduct = { ...res[0] };
+          setTimeout(() => {
+            const modalEl = document.getElementById('productModal');
+            if (modalEl) {
+              this.modal = new (window as any).bootstrap.Modal(modalEl);
+              this.modal.show();
+            }
+          }, 100);
+        } else {
+          alert('Producto no encontrado');
+        }
+      },
+      error: (err) => console.error('❌ Error al abrir modal:', err)
+    });
   }
 
-  get totalPagesArray() {
-    return Array(this.totalPages).fill(0).map((_, i) => i + 1);
+  // 🔹 Actualizar producto desde modal
+  updateSelectedProduct() {
+    if (!this.selectedProduct) return;
+
+    const id = this.selectedProduct.idProductos;
+    this.dataService.updateProduct(id, this.selectedProduct).subscribe({
+      next: () => {
+        alert('✅ Producto actualizado correctamente');
+        this.modal.hide();
+        this.dataService.loadProducts();
+      },
+      error: (err) => console.error('❌ Error al actualizar producto:', err)
+    });
   }
 }
