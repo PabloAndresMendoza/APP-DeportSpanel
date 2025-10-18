@@ -13,7 +13,7 @@ import { DataApiService } from '../services/data-api';
 })
 export class User implements OnInit {
 
-  products = {
+  products:any = {
     idProductos: '',
     nombreProductos: '',
     descripcionProductos: '',
@@ -32,7 +32,6 @@ export class User implements OnInit {
     this.mostrarTodos();
   }
 
-  // 🔹 Cargar todos
   mostrarTodos(): void {
     this.dataService.loadProducts();
     this.dataService.getProducts().subscribe({
@@ -41,14 +40,13 @@ export class User implements OnInit {
     });
   }
 
-  // 🔹 Buscar por ID
   buscarPorId(): void {
     if (!this.idBusqueda || isNaN(this.idBusqueda)) {
       alert('Ingrese un ID válido');
       return;
     }
 
-    this.dataService.getProductById(this.idBusqueda).subscribe({
+    this.dataService.getProductById1(this.idBusqueda).subscribe({
       next: (res) => {
         console.log('Respuesta API:', res);
 
@@ -59,23 +57,23 @@ export class User implements OnInit {
         }
       },
       error: (err) => {
-        console.error('❌ Error buscando producto:', err);
+        console.error('Error buscando producto:', err);
         alert('Error al buscar el producto.');
       }
     });
   }
 
-  // 🔹 Eliminar producto
   eliminarProducto(idProductos: number): void {
     if (!confirm(`¿Seguro que deseas eliminar el producto con ID ${idProductos}?`)) return;
 
     this.dataService.deleteProduct(idProductos).subscribe({
       next: () => {
-        alert(`✅ Producto con ID ${idProductos} eliminado correctamente.`);
-        this.mostrarTodos();
+        alert(` Producto con ID ${idProductos} eliminado correctamente.`);
+        
+         this.mostrarTodos();
       },
       error: (err) => {
-        console.error('❌ Error al eliminar:', err);
+        console.error('Error al eliminar:', err);
         alert('Error al eliminar el producto.');
       }
     });
@@ -84,47 +82,55 @@ export class User implements OnInit {
    onSubmit(form: NgForm) {
     this.dataService.addProduct(this.products).subscribe({
       next: (res) => {
-        alert('✅ Producto insertado correctamente');
+        alert('Producto insertado correctamente');
+        this.productos.push({ ...this.products });
+
         this.dataService.loadProducts();
         form.resetForm();
       },
-      error: (err) => console.error('❌ Error al insertar producto:', err)
+      error: (err) => console.error('Error al insertar producto:', err)
     });
   }
 
-    // 🔹 Abrir modal para editar
   openModal(idProductos: number) {
-    this.dataService.getProductById(idProductos).subscribe({
+    this.dataService.getProductById1(idProductos).subscribe({
       next: (res) => {
-        if (res && res.length > 0) {
-          this.selectedProduct = { ...res[0] };
+        console.log('Respuesta del API:', res);
+
+        if (res && res.idProductos) {
+          this.selectedProduct = res;
+
           setTimeout(() => {
             const modalEl = document.getElementById('productModal');
             if (modalEl) {
               this.modal = new (window as any).bootstrap.Modal(modalEl);
               this.modal.show();
+            } else {
+              console.error('No se encontró el elemento del modal');
             }
           }, 100);
         } else {
-          alert('Producto no encontrado');
+          alert('No se encontró el producto con ese ID.');
         }
       },
-      error: (err) => console.error('❌ Error al abrir modal:', err)
+      error: (err) => {
+        console.error('Error al obtener producto:', err);
+        alert('Error al cargar el producto.');
+      },
     });
   }
 
-  // 🔹 Actualizar producto desde modal
   updateSelectedProduct() {
     if (!this.selectedProduct) return;
 
     const id = this.selectedProduct.idProductos;
     this.dataService.updateProduct(id, this.selectedProduct).subscribe({
       next: () => {
-        alert('✅ Producto actualizado correctamente');
+        alert('Producto actualizado correctamente');
         this.modal.hide();
         this.dataService.loadProducts();
       },
-      error: (err) => console.error('❌ Error al actualizar producto:', err)
+      error: (err) => console.error('Error al actualizar producto:', err)
     });
   }
 }

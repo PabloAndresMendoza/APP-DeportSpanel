@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -39,13 +39,14 @@ export class DataApiService {
     return this.http.post(this.apiUrl, product);
   }
 
-    updateProduct(id: number, product: any): Observable<any> {
-    return this.http.put(this.apiUrl, {
-      idProductos: id,
-      nombreProductos: product.nombreProductos,
-      descripcionProductos: product.descripcionProductos,
-      cantidadProductos: product.cantidadProductos,
-      fechaProductos: product.fechaProductos
-    });
+  updateProduct(idProductos: number, product: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}?idProductos=${idProductos}`, product);
+  }
+
+  getProductById1(idProductos: number): Observable<any> {
+    const url = `${this.apiUrl}?idProductos=${idProductos}`;
+    return this.http.get<any>(url).pipe(
+      map((res: any) => Array.isArray(res) ? res[0] : res)
+    );
   }
 }

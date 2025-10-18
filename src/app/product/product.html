@@ -17,10 +17,6 @@
   <h1 style="text-align: center; margin-top: 25px; margin-bottom: 20px; -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: #e50914;">Productos Deportivos</h1>
   <div class="top-bar">
     <div class="search-box">
-      <form (ngSubmit)="searchProduct(f)" #f="ngForm">
-        <input type="number" [(ngModel)]="id" name="id" [ngModelOptions]="{ updateOn: 'submit' }" />
-        <button type="submit" class="btn-add">🔍 Buscar</button>
-      </form>
     </div>
     <button class="btn-add" data-bs-toggle="modal" data-bs-target="#RegistrerModal">+ Registrar</button>
   </div>

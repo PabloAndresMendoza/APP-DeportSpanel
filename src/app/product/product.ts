@@ -26,7 +26,7 @@ export class Product implements OnInit {
   productList: ProductsInterface[] = [];
   selectedProduct: any = null;
   private modal: any;
-  id: number | null = null;
+  idHola: number | null = null;
 
   constructor(private dataService: DataService) {}
 
@@ -102,13 +102,10 @@ export class Product implements OnInit {
   }
 
   openModal(id: number) {
-    console.log('Abriendo modal para ID:', id);
-
     this.dataService.getProductById(id).subscribe({
       next: (res) => {
         if (res && res.length > 0) {
           this.selectedProduct = res[0];
-          console.log('Datos del producto:', this.selectedProduct);
 
           setTimeout(() => {
             const modalEl = document.getElementById('productModal');
